@@ -1,0 +1,191 @@
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h2>{{ modoEdicao() ? 'Editar Pessoa' : 'Nova Pessoa' }}</h2>
+      <p class="subtitle">{{ modoEdicao() ? 'Atualize os dados do registro' : 'Preencha os dados para cadastrar uma nova pessoa' }}</p>
+    </div>
+    <a routerLink="/pessoas" class="btn btn-outline">← Voltar</a>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <span>Carregando dados...</span>
+    </div>
+  }
+
+  @if (erro()) {
+    <div class="alert alert-error">{{ erro() }}</div>
+  }
+
+  @if (!loading()) {
+    <form [formGroup]="form" (ngSubmit)="salvar()">
+
+      <!-- Identificação -->
+      <div class="card">
+        <h3 class="card-title">Identificação</h3>
+        <div class="grid grid-3">
+          <div class="field">
+            <label>CPF <span class="required">*</span></label>
+            <input formControlName="cpf" placeholder="000.000.000-00" [class.invalid]="isInvalid('cpf')">
+            @if (isInvalid('cpf')) { <span class="error-msg">CPF é obrigatório</span> }
+          </div>
+          <div class="field">
+            <label>RG <span class="required">*</span></label>
+            <input formControlName="rg" placeholder="00.000.000-0" [class.invalid]="isInvalid('rg')">
+            @if (isInvalid('rg')) { <span class="error-msg">RG é obrigatório</span> }
+          </div>
+          <div class="field">
+            <label>Data de Nascimento <span class="required">*</span></label>
+            <input formControlName="data_nasc" placeholder="DD/MM/AAAA" maxlength="10" (input)="onData($event)" [class.invalid]="isInvalid('data_nasc')">
+            @if (isInvalid('data_nasc')) { <span class="error-msg">Data de nascimento é obrigatória</span> }
+          </div>
+          <div class="field col-2">
+            <label>Nome Completo <span class="required">*</span></label>
+            <input formControlName="nome" placeholder="Nome completo" [class.invalid]="isInvalid('nome')">
+            @if (isInvalid('nome')) { <span class="error-msg">Nome é obrigatório</span> }
+          </div>
+          <div class="field">
+            <label>Sexo <span class="required">*</span></label>
+            <select formControlName="sexo" [class.invalid]="isInvalid('sexo')">
+              <option value="">Selecione</option>
+              <option value="Masculino">Masculino</option>
+              <option value="Feminino">Feminino</option>
+            </select>
+            @if (isInvalid('sexo')) { <span class="error-msg">Sexo é obrigatório</span> }
+          </div>
+          <div class="field">
+            <label>Signo <span class="required">*</span></label>
+            <select formControlName="signo" [class.invalid]="isInvalid('signo')">
+              <option value="">Selecione</option>
+              @for (s of signos; track s) { <option [value]="s">{{ s }}</option> }
+            </select>
+            @if (isInvalid('signo')) { <span class="error-msg">Signo é obrigatório</span> }
+          </div>
+          <div class="field">
+            <label>Cor/Raça <span class="required">*</span></label>
+            <input formControlName="cor" placeholder="Ex: branco, preto, pardo" [class.invalid]="isInvalid('cor')">
+            @if (isInvalid('cor')) { <span class="error-msg">Cor é obrigatória</span> }
+          </div>
+        </div>
+      </div>
+
+      <!-- Família -->
+      <div class="card">
+        <h3 class="card-title">Filiação</h3>
+        <div class="grid grid-2">
+          <div class="field">
+            <label>Nome da Mãe <span class="required">*</span></label>
+            <input formControlName="mae" placeholder="Nome completo da mãe" [class.invalid]="isInvalid('mae')">
+            @if (isInvalid('mae')) { <span class="error-msg">Nome da mãe é obrigatório</span> }
+          </div>
+          <div class="field">
+            <label>Nome do Pai <span class="required">*</span></label>
+            <input formControlName="pai" placeholder="Nome completo do pai" [class.invalid]="isInvalid('pai')">
+            @if (isInvalid('pai')) { <span class="error-msg">Nome do pai é obrigatório</span> }
+          </div>
+        </div>
+      </div>
+
+      <!-- Contato -->
+      <div class="card">
+        <h3 class="card-title">Contato e Acesso</h3>
+        <div class="grid grid-2">
+          <div class="field">
+            <label>E-mail <span class="required">*</span></label>
+            <input formControlName="email" type="email" placeholder="email@exemplo.com" [class.invalid]="isInvalid('email')">
+            @if (isInvalid('email')) { <span class="error-msg">E-mail inválido</span> }
+          </div>
+          <div class="field">
+            <label>Senha <span class="required">*</span></label>
+            <input formControlName="senha" type="password" placeholder="Senha de acesso" [class.invalid]="isInvalid('senha')">
+            @if (isInvalid('senha')) { <span class="error-msg">Senha é obrigatória</span> }
+          </div>
+          <div class="field">
+            <label>Celular <span class="required">*</span></label>
+            <input formControlName="celular" placeholder="(00) 99999-9999" maxlength="15" (input)="onCelular($event)" [class.invalid]="isInvalid('celular')">
+            @if (isInvalid('celular')) { <span class="error-msg">Celular é obrigatório</span> }
+          </div>
+          <div class="field">
+            <label>Telefone Fixo</label>
+            <input formControlName="telefone_fixo" placeholder="(00) 9999-9999" maxlength="14" (input)="onTelefone($event)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Endereço -->
+      <div class="card">
+        <h3 class="card-title">Endereço</h3>
+        <div class="grid grid-3">
+          <div class="field col-2">
+            <label>Logradouro <span class="required">*</span></label>
+            <input formControlName="endereco" placeholder="Rua, Avenida, etc." [class.invalid]="isInvalid('endereco')">
+            @if (isInvalid('endereco')) { <span class="error-msg">Logradouro é obrigatório</span> }
+          </div>
+          <div class="field">
+            <label>Número <span class="required">*</span></label>
+            <input formControlName="numero" placeholder="Nº" [class.invalid]="isInvalid('numero')">
+            @if (isInvalid('numero')) { <span class="error-msg">Número é obrigatório</span> }
+          </div>
+          <div class="field">
+            <label>Bairro <span class="required">*</span></label>
+            <input formControlName="bairro" placeholder="Bairro" [class.invalid]="isInvalid('bairro')">
+            @if (isInvalid('bairro')) { <span class="error-msg">Bairro é obrigatório</span> }
+          </div>
+          <div class="field">
+            <label>CEP <span class="required">*</span></label>
+            <input formControlName="cep" placeholder="00000-000" maxlength="9" (input)="onCep($event)" [class.invalid]="isInvalid('cep')">
+            @if (isInvalid('cep')) { <span class="error-msg">CEP é obrigatório</span> }
+          </div>
+          <div class="field">
+            <label>Cidade <span class="required">*</span></label>
+            <input formControlName="cidade" placeholder="Cidade" [class.invalid]="isInvalid('cidade')">
+            @if (isInvalid('cidade')) { <span class="error-msg">Cidade é obrigatória</span> }
+          </div>
+          <div class="field">
+            <label>Estado <span class="required">*</span></label>
+            <select formControlName="estado" [class.invalid]="isInvalid('estado')">
+              <option value="">UF</option>
+              @for (uf of estados; track uf) { <option [value]="uf">{{ uf }}</option> }
+            </select>
+            @if (isInvalid('estado')) { <span class="error-msg">Estado é obrigatório</span> }
+          </div>
+        </div>
+      </div>
+
+      <!-- Saúde -->
+      <div class="card">
+        <h3 class="card-title">Dados de Saúde</h3>
+        <div class="grid grid-3">
+          <div class="field">
+            <label>Altura <span class="required">*</span></label>
+            <input formControlName="altura" placeholder="Ex: 1,75" [class.invalid]="isInvalid('altura')">
+            @if (isInvalid('altura')) { <span class="error-msg">Altura é obrigatória</span> }
+          </div>
+          <div class="field">
+            <label>Peso (kg) <span class="required">*</span></label>
+            <input formControlName="peso" placeholder="Ex: 70" [class.invalid]="isInvalid('peso')">
+            @if (isInvalid('peso')) { <span class="error-msg">Peso é obrigatório</span> }
+          </div>
+          <div class="field">
+            <label>Tipo Sanguíneo <span class="required">*</span></label>
+            <select formControlName="tipo_sanguineo" [class.invalid]="isInvalid('tipo_sanguineo')">
+              <option value="">Selecione</option>
+              @for (t of tiposSanguineos; track t) { <option [value]="t">{{ t }}</option> }
+            </select>
+            @if (isInvalid('tipo_sanguineo')) { <span class="error-msg">Tipo sanguíneo é obrigatório</span> }
+          </div>
+        </div>
+      </div>
+
+      <!-- Ações -->
+      <div class="form-actions">
+        <a routerLink="/pessoas" class="btn btn-outline">Cancelar</a>
+        <button type="submit" class="btn btn-primary" [disabled]="salvando()">
+          @if (salvando()) { Salvando... } @else { Salvar Registro }
+        </button>
+      </div>
+
+    </form>
+  }
+</div>
